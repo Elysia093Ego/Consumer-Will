@@ -111,7 +111,7 @@ export default function AdminDashboard() {
   const [broadcastSending, setBroadcastSending] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState("");
   const { onlineAdmins } = useAdminPresence();
-  const [editPermUsers, setEditPermUsers] = useState<{ id: string; username: string; numericId: string | null; avatarUrl: string | null; canEdit: boolean; createdAt: string }[]>([]);
+  const [editPermUsers, setEditPermUsers] = useState<{ id: string; username: string; numericId: string | null; avatarUrl: string | null; canEdit: boolean; canUpload: boolean; createdAt: string }[]>([]);
   const [editPermLoading, setEditPermLoading] = useState(true);
   const [editPermSearch, setEditPermSearch] = useState("");
   const [editPermToggling, setEditPermToggling] = useState<string | null>(null);
@@ -235,6 +235,20 @@ export default function AdminDashboard() {
       setEditPermUsers((prev) => prev.map((u) => u.id === userId ? { ...u, canEdit: newVal } : u));
     } catch {}
     setEditPermToggling(null);
+  }, [password]);
+
+  const [uploadPermToggling, setUploadPermToggling] = useState<string | null>(null);
+  const handleToggleUploadPerm = useCallback(async (userId: string, newVal: boolean) => {
+    setUploadPermToggling(userId);
+    try {
+      await fetch(`${API}/admin/users-upload-perms/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ canUpload: newVal }),
+      });
+      setEditPermUsers((prev) => prev.map((u) => u.id === userId ? { ...u, canUpload: newVal } : u));
+    } catch {}
+    setUploadPermToggling(null);
   }, [password]);
 
   const handleBroadcast = useCallback(async () => {
@@ -761,7 +775,7 @@ export default function AdminDashboard() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg px-5 py-3 mb-6">
               <p className="text-sm text-blue-800 flex items-center gap-2">
                 <Pencil size={16} />
-                {en ? "Grant or revoke article editing permissions for registered users" : "为已注册用户开放或撤销文章编辑权限"}
+                {en ? "Grant or revoke article editing and upload permissions for registered users" : "为已注册用户开放或撤销文章编辑权限和上传权限"}
               </p>
             </div>
 
@@ -778,8 +792,8 @@ export default function AdminDashboard() {
             <div className="bg-primary/10 border border-primary/20 rounded-lg px-5 py-2 mb-4 flex items-center justify-between">
               <span className="text-xs text-foreground/60">
                 {en
-                  ? `${editPermUsers.filter((u) => u.canEdit).length} user(s) with edit permission`
-                  : `${editPermUsers.filter((u) => u.canEdit).length} 位用户拥有编辑权限`}
+                  ? `${editPermUsers.filter((u) => u.canEdit).length} editor(s), ${editPermUsers.filter((u) => u.canUpload).length} uploader(s)`
+                  : `${editPermUsers.filter((u) => u.canEdit).length} 位编辑者，${editPermUsers.filter((u) => u.canUpload).length} 位上传者`}
               </span>
               <span className="text-xs text-foreground/40">
                 {en ? `${editPermUsers.length} total users` : `共 ${editPermUsers.length} 位用户`}
@@ -816,26 +830,46 @@ export default function AdminDashboard() {
                           <p className="text-[11px] text-foreground/40 font-mono">ID: {u.numericId || u.id.slice(0, 8)}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 flex-wrap justify-end">
                         {u.canEdit && (
                           <span className="text-[11px] font-bold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
                             {en ? "Editor" : "编辑者"}
                           </span>
                         )}
+                        {u.canUpload && (
+                          <span className="text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
+                            {en ? "Uploader" : "上传者"}
+                          </span>
+                        )}
                         <button
                           onClick={() => handleToggleEditPerm(u.id, !u.canEdit)}
                           disabled={editPermToggling === u.id}
-                          className={`text-xs font-bold px-4 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
+                          className={`text-xs font-bold px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
                             u.canEdit
                               ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
                               : "bg-green-600 text-white hover:bg-green-700"
                           }`}
                         >
                           {editPermToggling === u.id
-                            ? (en ? "..." : "...")
+                            ? "..."
                             : u.canEdit
-                              ? (en ? "Revoke" : "撤销权限")
-                              : (en ? "Grant Edit" : "开放权限")}
+                              ? (en ? "Revoke Edit" : "撤销编辑")
+                              : (en ? "Grant Edit" : "开放编辑")}
+                        </button>
+                        <button
+                          onClick={() => handleToggleUploadPerm(u.id, !u.canUpload)}
+                          disabled={uploadPermToggling === u.id}
+                          className={`text-xs font-bold px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
+                            u.canUpload
+                              ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
+                          }`}
+                        >
+                          {uploadPermToggling === u.id
+                            ? "..."
+                            : u.canUpload
+                              ? (en ? "Revoke Upload" : "撤销上传")
+                              : (en ? "Grant Upload" : "开放上传")}
                         </button>
                       </div>
                     </div>

@@ -102,7 +102,7 @@ router.post("/auth/login", async (req, res) => {
     }
 
     const result = await pool.query(
-      "SELECT id, username, password_hash, numeric_id, avatar_url, can_edit FROM site_users WHERE username = $1",
+      "SELECT id, username, password_hash, numeric_id, avatar_url, can_edit, can_upload FROM site_users WHERE username = $1",
       [username]
     );
     if (result.rows.length === 0) {
@@ -116,7 +116,7 @@ router.post("/auth/login", async (req, res) => {
     }
 
     const displayId = user.numeric_id ? String(user.numeric_id).padStart(11, "0") : user.id;
-    res.json({ id: user.id, username: user.username, numericId: displayId, avatarUrl: user.avatar_url || null, canEdit: !!user.can_edit });
+    res.json({ id: user.id, username: user.username, numericId: displayId, avatarUrl: user.avatar_url || null, canEdit: !!user.can_edit, canUpload: !!user.can_upload });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "登录失败，请稍后再试" });

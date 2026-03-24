@@ -50,6 +50,7 @@ router.get("/page-content/:pageId", async (req, res) => {
 
 router.get("/page-content-batch", async (req, res) => {
   try {
+    res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=120");
     const ids = (req.query.ids as string || "").split(",").filter(Boolean);
     if (ids.length === 0) return res.json([]);
     const placeholders = ids.map((_, i) => `$${i + 1}`).join(",");

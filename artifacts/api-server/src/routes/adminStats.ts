@@ -67,7 +67,7 @@ router.get("/admin/users-edit-perms", async (req, res) => {
   if (!checkAdmin(req, res)) return;
   try {
     const result = await pool.query(
-      "SELECT id, username, numeric_id, avatar_url, can_edit, created_at FROM site_users ORDER BY can_edit DESC, created_at DESC"
+      "SELECT id, username, numeric_id, avatar_url, can_edit, can_upload, created_at FROM site_users ORDER BY can_edit DESC, can_upload DESC, created_at DESC"
     );
     res.json(result.rows.map((r: any) => ({
       id: r.id,
@@ -75,6 +75,7 @@ router.get("/admin/users-edit-perms", async (req, res) => {
       numericId: r.numeric_id ? String(r.numeric_id).padStart(11, "0") : null,
       avatarUrl: r.avatar_url || null,
       canEdit: !!r.can_edit,
+      canUpload: !!r.can_upload,
       createdAt: r.created_at,
     })));
   } catch (err) {
@@ -92,6 +93,19 @@ router.put("/admin/users-edit-perms/:userId", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error("Update user edit perm error:", err);
+    res.status(500).json({ error: "Failed to update permission" });
+  }
+});
+
+router.put("/admin/users-upload-perms/:userId", async (req, res) => {
+  if (!checkAdmin(req, res)) return;
+  try {
+    const { userId } = req.params;
+    const { canUpload } = req.body as { canUpload: boolean };
+    await pool.query("UPDATE site_users SET can_upload = $1 WHERE id = $2", [!!canUpload, userId]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("Update user upload perm error:", err);
     res.status(500).json({ error: "Failed to update permission" });
   }
 });

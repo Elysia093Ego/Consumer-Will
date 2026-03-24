@@ -63,6 +63,7 @@ router.get("/articles/search", async (req, res) => {
 
 router.get("/articles", async (req, res) => {
   try {
+    res.set("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
     const { category } = req.query as { category?: string };
     const rows = category
       ? await db.select().from(articlesTable).where(eq(articlesTable.category, category)).orderBy(articlesTable.publishedAt)
@@ -86,12 +87,14 @@ router.get("/articles/:id", async (req, res) => {
 
 router.post("/articles", async (req, res) => {
   try {
-    const { id, title, content, imageUrl, category, publishedAt, updatedAt } = req.body;
+    const { id, title, titleEn, content, contentEn, imageUrl, category, publishedAt, updatedAt } = req.body;
     if (!id || !title || !category) return res.status(400).json({ error: "Missing required fields" });
     const row = await db.insert(articlesTable).values({
       id,
       title,
+      titleEn: titleEn ?? null,
       content: content ?? "",
+      contentEn: contentEn ?? null,
       imageUrl: imageUrl ?? null,
       category,
       publishedAt: new Date(publishedAt),
@@ -106,15 +109,14 @@ router.post("/articles", async (req, res) => {
 router.put("/articles/:id", async (req, res) => {
   try {
     const { title, titleEn, content, contentEn, imageUrl, updatedAt } = req.body;
+    const updates: Record<string, unknown> = { updatedAt: new Date(updatedAt) };
+    if (title !== undefined) updates.title = title;
+    if (titleEn !== undefined) updates.titleEn = titleEn;
+    if (content !== undefined) updates.content = content;
+    if (contentEn !== undefined) updates.contentEn = contentEn;
+    if ("imageUrl" in req.body) updates.imageUrl = imageUrl ?? null;
     const row = await db.update(articlesTable)
-      .set({
-        title,
-        titleEn: titleEn ?? null,
-        content,
-        contentEn: contentEn ?? null,
-        imageUrl: imageUrl ?? null,
-        updatedAt: new Date(updatedAt),
-      })
+      .set(updates)
       .where(eq(articlesTable.id, req.params.id))
       .returning();
     if (row.length === 0) return res.status(404).json({ error: "Not found" });

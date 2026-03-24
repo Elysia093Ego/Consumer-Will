@@ -8,6 +8,7 @@ export type SiteUser = {
   numericId?: string;
   avatarUrl?: string | null;
   canEdit?: boolean;
+  canUpload?: boolean;
 };
 
 interface UserAuthContextValue {
@@ -39,7 +40,7 @@ export function UserAuthProvider({ children }: { children: ReactNode }) {
       });
       const data = await res.json();
       if (!res.ok) return { ok: false, error: data.error ?? "登录失败" };
-      const u: SiteUser = { id: data.id, username: data.username, numericId: data.numericId, avatarUrl: data.avatarUrl, canEdit: !!data.canEdit };
+      const u: SiteUser = { id: data.id, username: data.username, numericId: data.numericId, avatarUrl: data.avatarUrl, canEdit: !!data.canEdit, canUpload: !!data.canUpload };
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(u));
       setUser(u);
       return { ok: true };

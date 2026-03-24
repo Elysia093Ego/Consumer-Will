@@ -11,6 +11,7 @@ import { ArrowLeft, Edit3, Check, X, Eye, ThumbsUp } from "lucide-react";
 import { LeftSocialSidebar } from "@/components/LeftSocialSidebar";
 import { useUserAuth } from "@/context/UserAuthContext";
 import { useBookmarks } from "@/hooks/useBookmarks";
+import { FruitTreeTable } from "@/components/FruitTreeTable";
 
 const defaultLetters: Record<string, { recipient: string; subtitle: string }> = {
   "1": {
@@ -289,36 +290,7 @@ export default function OpenLetterPage() {
           </div>
 
           {/* ── 标配模块：果树表格 ── */}
-          <Link href="/dengji">
-            <div className="mt-6 mb-8 border border-border/40 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors" style={{ fontFamily: "'Noto Sans SC', 'PingFang SC', sans-serif" }}>
-              <table className="w-full border-collapse table-fixed">
-                <colgroup><col style={{ width: "26%" }} /><col style={{ width: "26%" }} /><col style={{ width: "25%" }} /><col style={{ width: "23%" }} /></colgroup>
-                <tbody>
-                  <tr>
-                    {(en ? ["Software","AI","Profit"] : ["软件","AI","利润"]).map(c => (
-                      <td key={c} className="border border-border/40 px-4 py-5 text-center text-foreground font-bold text-2xl bg-card">{c}</td>
-                    ))}
-                    <td className="border border-border/40 px-2 py-5 text-center font-black text-white text-2xl" style={{ backgroundColor: "#E8A020" }}>{t("fruit", lang)}</td>
-                  </tr>
-                  <tr>
-                    <td className="border border-border/40 px-4 py-5 text-center text-foreground font-bold text-2xl bg-card">{lang === "en" ? "Devices" : lang === "ja" ? "デバイス" : lang === "zh-tw" ? <><span className="hidden md:inline">電腦|智慧手機</span><span className="md:hidden"><span className="underline underline-offset-4">電腦</span><br/>智慧手機</span></> : <><span className="hidden md:inline">电脑|智能手机</span><span className="md:hidden"><span className="underline underline-offset-4">电脑</span><br/>智能手机</span></>}</td>
-                    {(en ? ["Leisure Time","Spending"] : ["休闲时间","消费"]).map(c => (
-                      <td key={c} className="border border-border/40 px-4 py-5 text-center text-foreground font-bold text-2xl bg-card">{c}</td>
-                    ))}
-                    <td className="border border-border/40 px-2 py-5 text-center font-black text-white text-2xl" style={{ backgroundColor: "#2D6A4F" }}>{t("tree", lang)}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="px-5 py-4 bg-[#F8F4EE]">
-                <p className="text-base md:text-lg font-medium text-foreground leading-relaxed">
-                  {en
-                    ? "80% open equity sharing replaces free sharing — the guarantee that science and technology serve humanity."
-                    : "股权开放共享80%取代免费共享，是科学技术造福人类的保障。"
-                  }
-                </p>
-              </div>
-            </div>
-          </Link>
+          <FruitTreeTable />
         </motion.div>
         </div>
       </main>

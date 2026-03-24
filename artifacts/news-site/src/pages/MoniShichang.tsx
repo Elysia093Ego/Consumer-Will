@@ -14,9 +14,13 @@ function BlueArrowRight({ onClick, disabled, color = "#1565C0" }: { onClick?: (e
       disabled={disabled}
       className={`flex-shrink-0 transition-transform ${disabled ? "opacity-30 cursor-not-allowed" : "hover:scale-110 cursor-pointer active:scale-95"}`}
     >
-      <svg width="36" height="20" viewBox="0 0 36 20" fill="none">
+      <svg width="36" height="20" viewBox="0 0 36 20" fill="none" className="hidden md:block">
         <rect x="0" y="6" width="22" height="8" rx="2" fill={color} />
         <polygon points="20,2 36,10 20,18" fill={color} />
+      </svg>
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" className="md:hidden">
+        <rect x="6" y="0" width="8" height="18" rx="2" fill={color} />
+        <polygon points="2,16 10,28 18,16" fill={color} />
       </svg>
     </button>
   );
@@ -80,7 +84,12 @@ export default function MoniShichang() {
     { key: "electrical", name: "电气行业", defaultPost: "什么是新电气？", postContent: "新电气行业通过股权开放共享模式，让消费者主导电气产业链，从发电到输配全民参与，打造真正属于人民的电气产业。", investText: "电气行业平台", techStart: 0 },
     { key: "appliance", name: "电器行业", defaultPost: "什么是新电器？", postContent: "新电器行业通过股权开放共享模式，让消费者主导电器产业链，从设计到生产全民参与，打造真正属于人民的电器产业。", investText: "电器行业平台", techStart: 0 },
     { key: "chip", name: "芯片行业", defaultPost: "什么是新芯片？", postContent: "新芯片行业通过股权开放共享模式，让消费者主导芯片产业链，从设计到制造全民参与，打造真正属于人民的芯片产业。", investText: "芯片行业平台", techStart: 0 },
-    { key: "grain", name: "粮油行业", defaultPost: "什么是新粮油？", postContent: "新粮油行业通过股权开放共享模式，让消费者主导粮油产业链，从种植到加工全民参与，打造真正属于人民的粮油产业。", investText: "粮油行业平台", techStart: 0 },
+    { key: "grain", name: "粮油副食行业", defaultPost: "什么是新粮油副食？", postContent: "新粮油副食行业通过股权开放共享模式，让消费者主导粮油副食产业链，从种植到加工全民参与，打造真正属于人民的粮油副食产业。", investText: "粮油副食行业平台", techStart: 0 },
+    { key: "water", name: "自来水行业", defaultPost: "什么是新自来水？", postContent: "新自来水行业通过股权开放共享模式，让消费者主导供水产业链，从水源保护到管网建设全民参与，打造真正属于人民的自来水产业。", investText: "自来水行业平台", techStart: 0 },
+    { key: "energy", name: "能源燃气行业", defaultPost: "什么是新能源燃气？", postContent: "新能源燃气行业通过股权开放共享模式，让消费者主导能源燃气产业链，从开采到输送全民参与，打造真正属于人民的能源燃气产业。", investText: "能源燃气行业平台", techStart: 0 },
+    { key: "textile", name: "纺织服装行业", defaultPost: "什么是新纺织服装？", postContent: "新纺织服装行业通过股权开放共享模式，让消费者主导纺织服装产业链，从原料到成衣全民参与，打造真正属于人民的纺织服装产业。", investText: "纺织服装行业平台", techStart: 0 },
+    { key: "medical", name: "医疗卫生行业", defaultPost: "什么是新医疗卫生？", postContent: "新医疗卫生行业通过股权开放共享模式，让消费者主导医疗卫生产业链，从药品研发到医疗服务全民参与，打造真正属于人民的医疗卫生产业。", investText: "医疗卫生行业平台", techStart: 0 },
+    { key: "realestate", name: "房地产建筑行业", defaultPost: "什么是新房地产建筑？", postContent: "新房地产建筑行业通过股权开放共享模式，让消费者主导房地产建筑产业链，从设计到施工全民参与，打造真正属于人民的房地产建筑产业。", investText: "房地产建筑行业平台", techStart: 0 },
   ];
 
   type IndustryState = {
@@ -105,7 +114,7 @@ export default function MoniShichang() {
         techRegistered: false,
         techCount: ind.techStart,
         techAnswer: null,
-        expanded: true,
+        expanded: ind.key === "edu" || ind.key === "social",
         modal: null,
         forumPosts: [{ id: 1, title: ind.defaultPost, content: ind.postContent, author: "系统", time: "2026-01-01", replies: [] }],
       };
@@ -138,7 +147,17 @@ export default function MoniShichang() {
           if (s.oweHumanity !== undefined) setOweHumanity(s.oweHumanity);
           if (s.humanityOwes !== undefined) setHumanityOwes(s.humanityOwes);
           if (s.gameDay !== undefined) setGameDay(s.gameDay);
-          if (s.industries) setIndustries(s.industries);
+          if (s.industries) {
+            setIndustries(prev => {
+              const merged = { ...prev };
+              INDUSTRY_LIST.forEach(ind => {
+                if (s.industries[ind.key]) {
+                  merged[ind.key] = { ...s.industries[ind.key], expanded: ind.key === "edu" || ind.key === "social" };
+                }
+              });
+              return merged;
+            });
+          }
         }
         setGameLoaded(true);
       })
@@ -305,17 +324,17 @@ export default function MoniShichang() {
     });
   }, []);
 
-  const days = Array.from({ length: Math.min(gameDay + 1, maxDay) }, (_, i) => i + 1).slice(0, Math.max(gameDay, 3));
+  const days = Array.from({ length: gameDay }, (_, i) => i + 1);
 
   return (
     <div className="min-h-screen flex flex-col w-full overflow-x-hidden bg-background">
       <Header />
-      <main className="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-8 pt-8 pb-20" style={{ fontFamily: FONT_CN }}>
+      <main className="flex-grow w-full max-w-3xl mx-auto px-4 md:px-8 pt-8 pb-20" style={{ fontFamily: FONT_CN }}>
 
         <div className="mb-8">
           <h1
-            className="inline-block text-2xl md:text-3xl font-bold text-primary"
-            style={{ letterSpacing: "0.05em" }}
+            className="inline-block text-2xl md:text-3xl font-black"
+            style={{ letterSpacing: "0.05em", color: "#8B1A1A", fontFamily: "'Noto Sans SC', 'PingFang SC', sans-serif" }}
           >
             模拟市场游戏
           </h1>
@@ -338,7 +357,7 @@ export default function MoniShichang() {
           </div>
         )}
 
-        <section className="mb-10">
+        <section className="mb-10 rounded-2xl bg-white/70 border border-foreground/10 shadow-md p-6 md:p-8">
           <h2 className="text-lg md:text-xl font-bold text-foreground mb-6">1、把劳动承诺转化为资本（游戏）</h2>
 
           <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 mb-8">
@@ -390,64 +409,59 @@ export default function MoniShichang() {
               <p className="mt-2">这就是<span className="font-bold text-primary">把劳动承诺转化为资本</span>的过程。</p>
             </div>
           )}
-        </section>
-
-        <section className="mb-10 rounded-2xl bg-white/70 border border-foreground/10 shadow-md p-6 md:p-8">
+          <div className="mt-8 pt-6 border-t border-foreground/10">
           <h2 className="text-xl md:text-2xl font-black text-foreground mb-5 flex items-center gap-3">
             <span className="w-1.5 h-7 rounded-full bg-primary inline-block" />
             游戏日历
           </h2>
 
-          <div className="flex items-center gap-2 flex-wrap mb-6 overflow-x-auto py-2">
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-1.5">
             {days.map((d, i) => {
               const from = peopleAtDay(d);
               const to = peopleAtDay(d + 1);
               const isPast = d < gameDay;
               const isCurrent = d === gameDay;
-              const isFuture = d > gameDay;
-              const textColor = isPast ? "text-green-600" : isCurrent ? "text-primary" : "text-amber-500";
+              const bgColor = isCurrent ? "rgba(0,0,0,0.06)" : isPast ? "rgba(22,163,74,0.04)" : "rgba(0,0,0,0.02)";
+              const textColor = isPast ? "#16a34a" : isCurrent ? "#eab308" : "#d97706";
+              const borderLeft = isCurrent ? "3px solid #eab308" : isPast ? "3px solid #16a34a" : "3px solid transparent";
               const arrowColor = isPast ? "#16a34a" : isCurrent ? "#eab308" : "#1565C0";
+              const isLastDay = d === maxDay;
               return (
-                <div key={d} className="flex items-center gap-2 flex-shrink-0">
-                  <div className="flex flex-col items-center">
-                    <span className="text-base font-bold">
-                      {isCurrent ? (
-                        <>
-                          <span className="text-green-600">{from}人→</span>
-                          <span className="text-yellow-500">{to}人</span>
-                        </>
-                      ) : (
-                        <span className={textColor}>{from}人→{to}人</span>
-                      )}
-                    </span>
-                    <span className={`text-sm font-bold ${textColor}`}>
-                      {d}游戏日
-                    </span>
-                  </div>
-                  {i < days.length - 1 && (
-                    <BlueArrowRight
-                      onClick={(e: React.MouseEvent) => {
-                        setGameDay(d);
-                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                        setInviteEffect({ x: rect.left + rect.width / 2, y: rect.top, id: Date.now() });
-                        playHappySound();
-                        setTimeout(() => setInviteEffect(null), 1800);
-                      }}
-                      color={arrowColor}
-                    />
-                  )}
-                  {i === days.length - 1 && d < maxDay && (
-                    <BlueArrowRight
-                      onClick={(e: React.MouseEvent) => {
-                        handleNextDay();
-                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                        setInviteEffect({ x: rect.left + rect.width / 2, y: rect.top, id: Date.now() });
-                        playHappySound();
-                        setTimeout(() => setInviteEffect(null), 1800);
-                      }}
-                      color={arrowColor}
-                    />
-                  )}
+                <div key={d} className={`flex items-center rounded-lg px-2.5 py-1.5 ${isLastDay ? "md:col-span-2 md:justify-center md:py-3 py-2.5 justify-center" : ""}`} style={{ background: bgColor, borderLeft }}>
+                  <span className={`font-bold mr-2 flex-shrink-0 ${isLastDay ? "text-sm md:text-base" : "text-xs"}`} style={{ color: isCurrent ? "#16a34a" : textColor, minWidth: isLastDay ? undefined : 36 }}>第{d}日</span>
+                  <span className={`font-mono font-bold truncate ${isLastDay ? "text-sm md:text-base flex-initial" : "text-xs flex-1"}`}>
+                    {isCurrent ? (
+                      <><span style={{ color: "#16a34a" }}>{from.toLocaleString()}</span><span style={{ color: "#16a34a" }}>→</span><span style={{ color: "#eab308" }}>{to.toLocaleString()}</span></>
+                    ) : (
+                      <span style={{ color: textColor }}>{from.toLocaleString()}→{to.toLocaleString()}</span>
+                    )}
+                  </span>
+                  <span className="flex-shrink-0 ml-1">
+                    {i < days.length - 1 && (
+                      <BlueArrowRight
+                        onClick={(e: React.MouseEvent) => {
+                          setGameDay(d);
+                          const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                          setInviteEffect({ x: rect.left + rect.width / 2, y: rect.top, id: Date.now() });
+                          playHappySound();
+                          setTimeout(() => setInviteEffect(null), 1800);
+                        }}
+                        color={arrowColor}
+                      />
+                    )}
+                    {i === days.length - 1 && d < maxDay && (
+                      <BlueArrowRight
+                        onClick={(e: React.MouseEvent) => {
+                          handleNextDay();
+                          const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                          setInviteEffect({ x: rect.left + rect.width / 2, y: rect.top, id: Date.now() });
+                          playHappySound();
+                          setTimeout(() => setInviteEffect(null), 1800);
+                        }}
+                        color={arrowColor}
+                      />
+                    )}
+                  </span>
                 </div>
               );
             })}
@@ -489,16 +503,17 @@ export default function MoniShichang() {
               <p className="text-sm text-foreground/80 leading-relaxed">总存款（1——{gameDay}游戏日）：<span className="num-sparkle-wrap font-mono font-bold text-primary" key={`dep-${gameDay}`}>{totalDeposits.toFixed(2)}{Array.from({length:10}).map((_,i)=><span key={i} className="num-sparkle-dot" style={{"--sx":`${(Math.random()-0.5)*50}px`,"--sy":`${(Math.random()-0.5)*30}px`,left:`${Math.random()*100}%`,top:`${Math.random()*100}%`,width:4+Math.random()*4,height:4+Math.random()*4,backgroundColor:["#E65100","#FF9800","#FFD54F","#4CAF50","#2196F3","#F44336"][i%6],animationDelay:`${Math.random()*0.3}s`} as React.CSSProperties} />)}</span></p>
             </div>
           </div>
+          </div>
         </section>
 
 
         <section className="mb-10 rounded-2xl bg-white/70 border border-foreground/10 shadow-md p-6 md:p-8">
-          <h2 className="text-lg md:text-xl font-black text-foreground mb-5">
-            2、存款投资公共市场，锁定流动性（游戏）
+          <h2 className="text-lg md:text-xl font-black text-foreground mb-5 whitespace-nowrap">
+            2、存款投资公共市场<span className="hidden md:inline">，</span><span className="md:hidden">｜</span>锁定流动性（游戏）
           </h2>
 
-          <div className="flex flex-col md:flex-row gap-6 items-start">
-            <div className="flex-1 space-y-4">
+          <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+            <div className="flex-1 space-y-4 w-full md:w-auto text-center md:text-left flex flex-col items-center md:items-start">
               <div className="text-sm text-foreground leading-relaxed">
                 <p className="font-bold mb-2">个人演示</p>
                 <p>投入：<span className="font-mono font-bold">10000.00</span>存款</p>
@@ -525,8 +540,7 @@ export default function MoniShichang() {
               </button>
 
               <div
-                className="mt-4 bg-background/50 rounded-lg border border-border/30 overflow-hidden"
-                style={{ maxWidth: "13rem" }}
+                className="mt-4 bg-background/50 rounded-lg border border-border/30 overflow-hidden md:max-w-[13rem]"
                 onMouseEnter={() => setGoalOpen(true)}
               >
                 <button
@@ -547,10 +561,10 @@ export default function MoniShichang() {
               </div>
             </div>
 
-            <div className="flex-1 space-y-4">
-              <div className="relative text-sm text-foreground leading-relaxed bg-background/50 rounded-lg p-3 border border-border/30 max-w-xs">
+            <div className="flex-1 space-y-4 w-full md:w-auto text-center md:text-left flex flex-col items-center md:items-start">
+              <div className="relative text-sm text-foreground leading-relaxed bg-background/50 rounded-lg p-3 border border-border/30 md:max-w-xs w-full text-left">
                 <p className="font-bold text-primary text-sm mb-2">你的模拟账号</p>
-                <button onClick={() => setShowAccountTip(v => !v)} className="w-5 h-5 rounded bg-green-700 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-green-600 absolute top-2 right-2">?</button>
+                <button onMouseEnter={() => setShowAccountTip(true)} onMouseLeave={() => setShowAccountTip(false)} onClick={() => setShowAccountTip(true)} className="w-5 h-5 rounded bg-green-700 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-green-600 absolute top-2 right-2">?</button>
                 {showAccountTip && <span className="absolute top-2 right-9 text-xs text-foreground/60 bg-white border border-border rounded px-2 py-1 shadow z-10">模拟数据，仅供演示</span>}
                 <p>借款：<span className="font-mono font-bold">{invested ? "10000.00" : "0.00"}</span></p>
                 <p>股权：<span className="font-mono font-bold">{invested ? "20000.00" : "0.00"}</span></p>
@@ -587,9 +601,9 @@ export default function MoniShichang() {
               </div>
 
 
-              <div className="mt-4">
+              <div className="mt-4 w-full">
                 <p className="font-bold text-sm mb-2">时间加速器</p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 md:justify-start justify-center">
                   <button
                     onClick={() => {
                       if (invested && accelTickets > 0) {
@@ -607,7 +621,7 @@ export default function MoniShichang() {
                   >
                     加速1天
                   </button>
-                  <button onClick={() => setShowAccelTip(v => !v)} className="w-5 h-5 rounded bg-green-700 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-green-600">?</button>
+                  <button onMouseEnter={() => setShowAccelTip(true)} onMouseLeave={() => setShowAccelTip(false)} onClick={() => setShowAccelTip(true)} className="w-5 h-5 rounded bg-green-700 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-green-600">?</button>
                   {showAccelTip && <span className="text-xs text-foreground/60 bg-white border border-border rounded px-2 py-1 shadow">每次点击消耗一张加速券</span>}
                 </div>
                 {invested && (
@@ -626,13 +640,13 @@ export default function MoniShichang() {
             </div>
           </div>
 
-          <div className="mt-6 border-t border-border/30 pt-4">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="mt-6 border-t border-border/30 pt-4 text-center md:text-left">
+            <div className="flex items-center gap-2 mb-2 md:justify-start justify-center">
               <a href="https://registered-contract.replit.app/article/preset-jiuye-0" target="_blank" rel="noopener noreferrer" className="font-bold text-primary text-sm hover:underline">什么是公共市场？</a>
               <button onClick={() => setShowMarketTip(v => !v)} className="w-5 h-5 rounded bg-green-700 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-green-600">?</button>
             </div>
             {showMarketTip && (
-              <div className="text-sm text-foreground/80 leading-relaxed bg-background/50 rounded-lg p-3 border border-border/30">
+              <div className="text-sm text-foreground/80 leading-relaxed bg-background/50 rounded-lg p-3 border border-border/30 whitespace-nowrap">
                 <p>原理：用我们人类的消费整合企业、机构和商户！</p>
                 <p>价值=人类年消费×N%分销佣金×无限时间</p>
               </div>
@@ -640,7 +654,7 @@ export default function MoniShichang() {
           </div>
         </section>
 
-        <section className="bg-white/80 rounded-2xl shadow-sm border border-border/40 p-6" style={{ fontFamily: FONT_CN }}>
+        <section className="mb-10 bg-white/80 rounded-2xl shadow-sm border border-border/40 p-6" style={{ fontFamily: FONT_CN }}>
           <h2 className="text-xl font-black text-foreground mb-6">3、股息投资（游戏）</h2>
 
           {INDUSTRY_LIST.map(ind => {
@@ -753,6 +767,57 @@ export default function MoniShichang() {
             );
           })}
 
+        </section>
+
+        <section className="bg-white/80 rounded-2xl shadow-sm border border-border/40 p-6" style={{ fontFamily: FONT_CN }}>
+          <h2 className="text-xl font-black text-foreground mb-6">4、模式市场的目的（游戏）<br className="md:hidden" /><span className="md:hidden block text-right">——给休闲时间装上眼睛</span><span className="hidden md:inline">——给休闲时间装上眼睛</span></h2>
+
+          <div className="mb-6">
+            <svg viewBox="0 0 560 320" className="w-full max-w-lg mx-auto" style={{ fontFamily: FONT_CN }}>
+              <defs>
+                <linearGradient id="greenArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#059669" stopOpacity="0.95" />
+                </linearGradient>
+                <linearGradient id="yellowArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#eab308" stopOpacity="0.9" />
+                </linearGradient>
+              </defs>
+
+              <line x1="60" y1="20" x2="60" y2="270" stroke="#333" strokeWidth="2" />
+              <line x1="60" y1="270" x2="530" y2="270" stroke="#333" strokeWidth="2" />
+              <polygon points="60,15 56,25 64,25" fill="#333" />
+              <polygon points="535,270 525,266 525,274" fill="#333" />
+
+              <text x="25" y="60" textAnchor="middle" fontSize="13" fill="#333" fontWeight="bold">人</text>
+              <text x="25" y="78" textAnchor="middle" fontSize="13" fill="#333" fontWeight="bold">类</text>
+              <text x="25" y="96" textAnchor="middle" fontSize="13" fill="#333" fontWeight="bold">年</text>
+              <text x="25" y="114" textAnchor="middle" fontSize="13" fill="#333" fontWeight="bold">消</text>
+              <text x="25" y="132" textAnchor="middle" fontSize="13" fill="#333" fontWeight="bold">费</text>
+              <text x="530" y="295" textAnchor="middle" fontSize="14" fill="#333" fontWeight="bold">时间</text>
+
+              <path d="M60,270 L60,40 L480,40 L480,270 Z" fill="url(#yellowArea)" />
+              <path d="M60,270 L60,140 L160,140 L380,230 L480,230 L480,270 Z" fill="url(#greenArea)" />
+
+              <text x="270" y="120" textAnchor="middle" fontSize="20" fill="#fff" fontWeight="900">利润可计算</text>
+              <text x="140" y="210" textAnchor="middle" fontSize="15" fill="#fff" fontWeight="900">股权开放共享80%</text>
+              <text x="140" y="230" textAnchor="middle" fontSize="15" fill="#fff" fontWeight="900">成本可计算</text>
+            </svg>
+          </div>
+
+          <div className="bg-background/50 rounded-xl border border-border/30 p-5">
+            <h3 className="text-lg font-black text-foreground mb-3">估算</h3>
+            <div className="text-sm text-foreground leading-relaxed space-y-1">
+              <p>未来100年人类消费总额大于6000万亿美元</p>
+              <p>未来100年，股权开放共享80%</p>
+              <p>去掉分销、金融和盲目投资成本</p>
+              <p className="font-bold text-primary">利润总额大于3000万亿美元</p>
+              <p className="font-bold text-primary">会转化为人类的股权资产！</p>
+              <p className="mt-2">全球智力的休闲时间可以精确计算各个领域的成本，</p>
+              <p>实现去掉分销、金融和盲目投资成本。</p>
+            </div>
+          </div>
         </section>
 
       </main>
@@ -1044,7 +1109,8 @@ export default function MoniShichang() {
             @keyframes invite-float {
               0% { opacity: 0; transform: translateY(0) scale(0.7); }
               20% { opacity: 1; transform: translateY(-10px) scale(1); }
-              80% { opacity: 1; transform: translateY(-40px) scale(1); }
+              35% { opacity: 0.65; transform: translateY(-18px) scale(1); }
+              80% { opacity: 0.65; transform: translateY(-40px) scale(1); }
               100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
             }
             @keyframes mini-confetti {

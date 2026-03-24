@@ -22,7 +22,7 @@ function toArticle(row: Record<string, unknown>): UserArticle {
     titleEn: (row.titleEn ?? row.title_en) as string | undefined,
     content: (row.content as string) ?? "",
     contentEn: (row.contentEn ?? row.content_en) as string | undefined,
-    imageUrl: (row.imageUrl as string | null) ?? undefined,
+    imageUrl: ((row.imageUrl ?? row.image_url) as string | null) ?? undefined,
     category: row.category as string,
     publishedAt: row.publishedAt instanceof Date
       ? (row.publishedAt as Date).toISOString()

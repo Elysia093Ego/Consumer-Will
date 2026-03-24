@@ -233,7 +233,7 @@ interface CategoryPageProps {
 
 export default function CategoryPage({ slug }: CategoryPageProps) {
   const config = categoryData[slug];
-  const { articles: allArticles, publishArticle, updateArticle, deleteArticle } = useArticles(slug);
+  const { articles: allArticles, loading: articlesLoading, publishArticle, updateArticle, deleteArticle } = useArticles(slug);
   const { isAdmin } = useAdminAuth();
   const { user } = useUserAuth();
   const { lang } = useLang();
@@ -301,7 +301,7 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
               <><Plus className="w-3 h-3" />{t("save", lang)}</>
             )}
           </button>
-          {isAdmin && (
+          {(isAdmin || user?.canUpload) && (
             <button
               className="ml-auto flex items-center gap-1.5 bg-primary text-white text-xs font-bold px-3.5 py-1.5 rounded-md hover:bg-primary/90 transition-colors"
               onClick={openNew}
@@ -317,7 +317,18 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
         <div className="flex gap-6">
           {/* Main Content — newspaper-style layout */}
           <div className="flex-1 min-w-0">
-            {presetArticles.length > 0 && (
+            {articlesLoading && (
+              <div className="space-y-4 mb-6">
+                <div className="w-full aspect-[16/10] rounded-lg bg-foreground/5 animate-pulse" />
+                <div className="h-6 w-3/4 rounded bg-foreground/5 animate-pulse" />
+                <div className="h-4 w-full rounded bg-foreground/5 animate-pulse" />
+                <div className="h-4 w-2/3 rounded bg-foreground/5 animate-pulse" />
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                  {[1, 2].map(i => <div key={i} className="h-32 rounded-lg bg-foreground/5 animate-pulse" />)}
+                </div>
+              </div>
+            )}
+            {!articlesLoading && presetArticles.length > 0 && (
               <>
                 {/* Hero row: featured large + stacked medium */}
                 <div className="flex gap-5 mb-6">

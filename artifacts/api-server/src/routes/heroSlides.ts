@@ -10,6 +10,7 @@ function isAdmin(req: any): boolean {
 
 router.get("/hero-slides", async (_req, res) => {
   try {
+    res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=120");
     const result = await pool.query(
       "SELECT id, kind, title, title_en, subtitle, subtitle_en, label, label_en, image_url, href, sort_order FROM hero_slides ORDER BY sort_order ASC"
     );

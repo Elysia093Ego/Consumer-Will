@@ -160,8 +160,12 @@ export default function Home() {
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const [cardOverrides, setCardOverrides] = useState<CardOverrides>({});
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(DEFAULT_HERO_SLIDES);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
+    let heroDone = false, cardsDone = false;
+    const checkDone = () => { if (heroDone && cardsDone) setDataLoaded(true); };
+
     fetch(`${API}/hero-slides`)
       .then((r) => r.json())
       .then((slides: HeroSlide[]) => {
@@ -169,7 +173,8 @@ export default function Home() {
           setHeroSlides(slides);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { heroDone = true; checkDone(); });
 
     const allHrefs = [...rowOne, ...rowTwo].map((c) => hrefToPageId(c.href));
     fetch(`${API}/page-content-batch?ids=${allHrefs.join(",")}`)
@@ -191,7 +196,8 @@ export default function Home() {
         }
         setCardOverrides(map);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { cardsDone = true; checkDone(); });
   }, []);
 
   useEffect(() => {
@@ -205,6 +211,31 @@ export default function Home() {
   const mergedRowTwo = applyOverrides(rowTwo, cardOverrides);
 
   const slide = heroSlides[activeSlide];
+
+  if (!dataLoaded) {
+    return (
+      <div className="min-h-screen flex flex-col w-full overflow-x-hidden bg-background">
+        <Header />
+        <main className="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-6 pt-6 pb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-9 flex flex-col gap-6">
+              <div className="w-full rounded-xl bg-foreground/5 animate-pulse" style={{ aspectRatio: "16/9" }} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="rounded-xl bg-foreground/5 animate-pulse h-40" />
+                ))}
+              </div>
+            </div>
+            <div className="lg:col-span-3 flex flex-col gap-4">
+              <div className="rounded-xl bg-foreground/5 animate-pulse h-60" />
+              <div className="rounded-xl bg-foreground/5 animate-pulse h-40" />
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col w-full overflow-x-hidden bg-background">

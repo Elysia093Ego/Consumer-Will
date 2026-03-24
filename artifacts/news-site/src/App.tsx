@@ -15,6 +15,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import DengjiPage from "@/pages/DengjiPage";
 import PlaceholderPage from "@/pages/PlaceholderPage";
+import YuanliPage from "@/pages/YuanliPage";
 import ProfilePage from "@/pages/ProfilePage";
 import AdminDashboard from "@/pages/AdminDashboard";
 import OpenLetterPage from "@/pages/OpenLetterPage";
@@ -101,9 +102,7 @@ function Router() {
       <Route path="/zhaopian">
         <PlaceholderPage pageId="zhaopian" title="访谈活动 · 照片" titleEn="Interview Events · Photos" description="WILLERS 系列访谈活动的珍贵影像记录" descriptionEn="Precious photo archives from the WILLERS interview series" />
       </Route>
-      <Route path="/shehui-kexue">
-        <PlaceholderPage pageId="shuxueyuanli" title="社会科学的数学原理" titleEn="Mathematical Principles of Social Science" description="用数学语言解析社会运行规律" descriptionEn="Analyzing social systems through mathematical language" />
-      </Route>
+      <Route path="/shehui-kexue" component={YuanliPage} />
 
       {/* 橙色横幅 */}
       <Route path="/lilun">
@@ -126,9 +125,7 @@ function Router() {
       <Route path="/fuwutiaokuan">
         <PlaceholderPage pageId="fuwutiaokuan" title="服务条款" titleEn="Terms of Service" description="使用本平台即表示您同意以下服务条款" descriptionEn="By using this platform, you agree to the following terms" noStandardModules />
       </Route>
-      <Route path="/shuxueyuanli">
-        <PlaceholderPage pageId="shuxueyuanli" title="社会科学的数学原理" titleEn="Mathematical Principles of Social Science" description="用数学语言解析社会运行规律，社会科学的数学基础与市场经济的数学逻辑" descriptionEn="Analyzing social systems through mathematical language — foundations of social science and market economy logic" />
-      </Route>
+      <Route path="/shuxueyuanli" component={YuanliPage} />
 
       <Route component={NotFound} />
     </Switch>

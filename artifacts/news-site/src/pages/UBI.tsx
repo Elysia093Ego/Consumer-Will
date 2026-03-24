@@ -131,7 +131,7 @@ export default function UBI() {
               <><Plus className="w-3 h-3" />{en ? "Save" : "收藏"}</>
             )}
           </button>
-          {isAdmin && (
+          {(isAdmin || user?.canUpload) && (
             <button
               className="ml-auto flex items-center gap-1.5 bg-primary text-white text-xs font-bold px-3.5 py-1.5 rounded-md hover:bg-primary/90 transition-colors"
               onClick={openNew}

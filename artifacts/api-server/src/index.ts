@@ -113,7 +113,8 @@ async function migrate() {
       ADD COLUMN IF NOT EXISTS avatar_url TEXT,
       ADD COLUMN IF NOT EXISTS email TEXT DEFAULT '',
       ADD COLUMN IF NOT EXISTS phone TEXT DEFAULT '',
-      ADD COLUMN IF NOT EXISTS can_edit BOOLEAN DEFAULT FALSE
+      ADD COLUMN IF NOT EXISTS can_edit BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS can_upload BOOLEAN DEFAULT FALSE
   `);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS verification_codes (
