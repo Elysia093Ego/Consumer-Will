@@ -1,0 +1,44 @@
+import { Router, type IRouter } from "express";
+import healthRouter from "./health";
+import articlesRouter from "./articles";
+import authRouter from "./auth";
+import dengjiRouter from "./dengji";
+import sidebarLinksRouter from "./sidebarLinks";
+import articleStatsRouter from "./articleStats";
+import followsRouter from "./follows";
+import adminStatsRouter from "./adminStats";
+import openLettersRouter from "./openLetters";
+import pageContentRouter from "./pageContent";
+import heroSlidesRouter from "./heroSlides";
+import feedbackRouter from "./feedback";
+import adminPresenceRouter from "./adminPresence";
+import qaRouter from "./qa";
+import notificationsRouter from "./notifications";
+import bookmarksRouter from "./bookmarks";
+import uiTranslationsRouter from "./uiTranslations";
+import milestonesRouter from "./milestones";
+import gameStateRouter from "./gameState";
+
+const router: IRouter = Router();
+
+router.use(healthRouter);
+router.use(articlesRouter);
+router.use(authRouter);
+router.use(dengjiRouter);
+router.use(sidebarLinksRouter);
+router.use(articleStatsRouter);
+router.use(followsRouter);
+router.use(adminStatsRouter);
+router.use(openLettersRouter);
+router.use(pageContentRouter);
+router.use(heroSlidesRouter);
+router.use(feedbackRouter);
+router.use(adminPresenceRouter);
+router.use(qaRouter);
+router.use(notificationsRouter);
+router.use(bookmarksRouter);
+router.use(uiTranslationsRouter);
+router.use(milestonesRouter);
+router.use(gameStateRouter);
+
+export default router;

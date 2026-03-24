@@ -1,0 +1,8 @@
+packages:
+  "framer-motion": "For page transitions, stagger animations, and scroll reveals"
+  "lucide-react": "For icons across the UI"
+
+notes:
+  - This is a frontend-only mockup based on the provided design reference
+  - Chinese typography requires Noto Serif SC and Noto Sans SC to render beautifully
+  - The stair-step visual is created using CSS shapes/flexbox to match the editorial style
